@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #0d2b45;
+  background-color: #0b1d2c;
   color: #333;
   display: flex;
   justify-content: center;
@@ -16,37 +16,22 @@ body {
 
 #app-container {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
+  height: 720px;
   background: #00529b;
-  min-height: 100vh;
   position: relative;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-@media (min-width: 768px) {
-  #app-container {
-    max-width: 440px;
-    height: 860px;
-    min-height: 860px;
-    border-radius: 24px;
-    border: 8px solid #222;
-    overflow: hidden;
-  }
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border-radius: 16px;
+  border: 6px solid #1a1a1a;
 }
 
 .screen {
   display: none;
   flex-direction: column;
-  min-height: 100vh;
-  padding: 20px;
+  min-height: 100%;
+  padding: 14px 16px;
   color: #fff;
-}
-
-@media (min-width: 768px) {
-  .screen {
-    min-height: 844px;
-  }
 }
 
 .screen.active {
@@ -55,7 +40,7 @@ body {
 
 /* Loading Overlay Spinner */
 #loading-overlay {
-  position: fixed;
+  position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.75);
   display: none;
@@ -71,13 +56,13 @@ body {
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255,255,255,0.3);
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.3);
   border-radius: 50%;
   border-top-color: #ff5722;
   animation: spin 1s ease-in-out infinite;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 @keyframes spin {
@@ -85,11 +70,40 @@ body {
 }
 
 .loading-text {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: bold;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   text-align: center;
-  padding: 0 20px;
+  padding: 0 15px;
+}
+
+/* Accurate Tanzania Flag Design */
+.tz-flag {
+  width: 100px;
+  height: 60px;
+  margin: 0 auto 8px auto;
+  background: #1eb53a; /* Green base */
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.tz-flag::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #00a3dd 42%, #fcd116 42%, #fcd116 58%, #000 58%);
+}
+
+.tz-flag.mini {
+  width: 28px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  box-shadow: none;
 }
 
 /* Screen 1 */
@@ -97,21 +111,21 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .lang-switch-container {
   display: flex;
   align-items: center;
   background: rgba(0,0,0,0.2);
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: bold;
 }
 
 .lang-switch-container span {
-  margin: 0 4px;
+  margin: 0 3px;
   opacity: 0.6;
 }
 
@@ -122,9 +136,9 @@ body {
 .switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 20px;
-  margin: 0 6px;
+  width: 34px;
+  height: 18px;
+  margin: 0 4px;
 }
 
 .switch input {
@@ -145,8 +159,8 @@ body {
 .slider-round:before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
+  height: 12px;
+  width: 12px;
   left: 3px;
   bottom: 3px;
   background-color: white;
@@ -159,22 +173,22 @@ input:checked + .slider-round {
 }
 
 input:checked + .slider-round:before {
-  transform: translateX(20px);
+  transform: translateX(16px);
 }
 
 .chat-icon {
-  font-size: 20px;
+  font-size: 16px;
   background: rgba(255,255,255,0.1);
-  padding: 8px;
+  padding: 6px;
   border-radius: 50%;
 }
 
 .selcom-brand h1 {
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   color: #fff;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .welcome-content {
@@ -183,86 +197,67 @@ input:checked + .slider-round:before {
 }
 
 .welcome-content h2 {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .subtitle {
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  margin-bottom: 15px;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
   opacity: 0.9;
 }
 
 .desc {
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  font-size: 11px;
+  line-height: 1.35;
+  margin-bottom: 10px;
   opacity: 0.85;
 }
 
 .critical-box {
   background: #ffcc00;
   color: #1a1a1a;
-  padding: 15px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   text-align: left;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .critical-title {
   font-weight: 800;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-size: 12px;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .critical-box p {
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 10.5px;
+  line-height: 1.3;
 }
 
 .flag-card {
   background: #0d2b45;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
-.tz-flag {
-  width: 120px;
-  height: 70px;
-  margin: 0 auto 10px auto;
-  background: #00a3dd;
-  position: relative;
-  overflow: hidden;
-  border-radius: 4px;
-}
-
-.tz-black {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(135deg, #000 45%, #fcd116 45%, #fcd116 55%, #009639 55%);
-}
-
-.tz-flag.mini {
-  width: 32px;
-  height: 20px;
-  display: inline-block;
-  vertical-align: middle;
+.flag-card p {
+  font-size: 11px;
+  opacity: 0.9;
 }
 
 .btn {
   width: 100%;
-  padding: 15px;
+  padding: 12px;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   text-align: center;
@@ -276,6 +271,7 @@ input:checked + .slider-round:before {
 .btn-green {
   background-color: #2e7d32;
   color: white;
+  margin-top: auto;
 }
 
 /* Screen 2 */
@@ -285,89 +281,89 @@ input:checked + .slider-round:before {
 }
 
 .estimate-content h2 {
-  font-size: 20px;
-  margin-bottom: 25px;
+  font-size: 16px;
+  margin-bottom: 12px;
 }
 
 .slider-group {
   background: rgba(0,0,0,0.15);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
   text-align: left;
 }
 
 .slider-group label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   opacity: 0.8;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .slider-val {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 800;
   color: #4cd964;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 input[type="range"] {
   width: 100%;
   accent-color: #4cd964;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .slider-limits {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 9.5px;
   opacity: 0.7;
 }
 
 .repayment-summary-card {
   background: rgba(0,0,0,0.25);
-  padding: 15px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .card-title {
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.8;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .monthly-val {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   color: #ff5252;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .card-divider {
   border: 0;
   height: 1px;
   background: rgba(255,255,255,0.2);
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 .total-title {
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.8;
   display: block;
 }
 
 .total-val {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .interest-note {
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.7;
   font-style: italic;
 }
@@ -375,17 +371,18 @@ input[type="range"] {
 .btn-white-bottom {
   background: #ffffff;
   color: #00529b;
+  margin-top: auto;
 }
 
 /* Screens 3, 4, 5 Forms */
 .form-screen {
   background: #581845;
-  padding: 0;
+  padding: 0 !important;
 }
 
 .burgundy-header {
   background: #4a1238;
-  padding: 15px 20px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -396,49 +393,50 @@ input[type="range"] {
   background: none;
   border: none;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
 }
 
 .header-brand {
   font-weight: bold;
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .sub-brand {
-  font-size: 12px;
+  font-size: 10.5px;
   opacity: 0.9;
 }
 
 .hamburger {
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 .form-card-container {
-  padding: 20px;
+  padding: 14px 16px;
   flex: 1;
+  overflow-y: auto;
 }
 
 .form-main-title {
-  font-size: 22px;
+  font-size: 18px;
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .step-indicator {
   text-align: center;
-  font-size: 13px;
+  font-size: 11.5px;
   opacity: 0.8;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .progress-bar-container {
   width: 100%;
   background: rgba(255,255,255,0.2);
-  height: 4px;
+  height: 3px;
   border-radius: 2px;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
 }
 
 .progress-fill {
@@ -448,13 +446,13 @@ input[type="range"] {
 }
 
 .input-group {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .input-group label {
   display: block;
-  font-size: 13px;
-  margin-bottom: 6px;
+  font-size: 11.5px;
+  margin-bottom: 4px;
   font-weight: 500;
 }
 
@@ -462,16 +460,16 @@ input[type="range"] {
 .input-group input,
 .input-group textarea {
   width: 100%;
-  padding: 12px 15px;
+  padding: 10px 12px;
   background: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 6px;
+  font-size: 13.5px;
   color: #333;
 }
 
 .input-group textarea {
-  height: 90px;
+  height: 70px;
   resize: none;
 }
 
@@ -479,13 +477,14 @@ input[type="range"] {
   background: #ff5722;
   color: white;
   border-radius: 0;
-  padding: 18px;
-  font-size: 16px;
+  padding: 14px;
+  font-size: 15px;
+  margin-top: auto;
 }
 
 .name-row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .input-group.half {
@@ -495,20 +494,20 @@ input[type="range"] {
 .phone-input-wrapper {
   display: flex;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .flag-prefix {
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 8px;
   background: #f1f1f1;
   border-right: 1px solid #ddd;
-  gap: 6px;
+  gap: 5px;
   color: #333;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .phone-input-wrapper input {
@@ -516,63 +515,65 @@ input[type="range"] {
 }
 
 .helper-note {
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.75;
-  margin-top: 5px;
+  margin-top: 4px;
   display: block;
 }
 
 .dual-btn-row {
   display: flex;
+  margin-top: auto;
 }
 
 .btn-gray {
   background: #7f8c8d;
   color: white;
   border-radius: 0;
+  padding: 14px;
 }
 
 .summary-box {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 15px;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 10px;
 }
 
 .summary-box h3 {
-  font-size: 15px;
-  margin-bottom: 10px;
+  font-size: 13px;
+  margin-bottom: 8px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 5px;
+  padding-bottom: 4px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
-  margin-bottom: 6px;
+  font-size: 11.5px;
+  margin-bottom: 5px;
 }
 
 /* Screens 6 & 7 PIN/OTP */
 .pin-screen, .otp-screen {
   background: radial-gradient(circle, #581845 0%, #2b0c22 100%);
   text-align: center;
-  padding: 30px 20px;
+  padding: 20px 16px;
 }
 
 .pin-badge-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .selcom-white-badge {
   background: #fff;
-  padding: 8px 18px;
-  border-radius: 8px;
+  padding: 6px 14px;
+  border-radius: 6px;
   color: #000;
   display: flex;
   flex-direction: column;
@@ -581,7 +582,7 @@ input[type="range"] {
 
 .selcom-text {
   font-weight: 900;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .c-red {
@@ -589,92 +590,105 @@ input[type="range"] {
 }
 
 .badge-sub {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   color: #333;
 }
 
 .pin-title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .pin-subtitle {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 11.5px;
+  line-height: 1.35;
   opacity: 0.85;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
 }
 
 .phone-indicator-box {
   background: rgba(255,255,255,0.1);
   display: inline-flex;
   align-items: center;
-  padding: 8px 15px;
-  border-radius: 20px;
-  gap: 10px;
-  font-size: 13px;
-  margin-bottom: 25px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  gap: 8px;
+  font-size: 11.5px;
+  margin-bottom: 16px;
 }
 
 .pin-boxes-container, .otp-boxes-container {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 25px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.pin-box, .otp-box {
-  width: 50px;
-  height: 55px;
+.pin-box {
+  width: 42px;
+  height: 48px;
   background: linear-gradient(135deg, #e6c687 0%, #c59b27 100%);
   border: 2px solid #f3e5ab;
-  border-radius: 8px;
-  font-size: 24px;
+  border-radius: 6px;
+  font-size: 20px;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+}
+
+.otp-box {
+  width: 36px;
+  height: 44px;
+  background: linear-gradient(135deg, #e6c687 0%, #c59b27 100%);
+  border: 2px solid #f3e5ab;
+  border-radius: 6px;
+  font-size: 18px;
   text-align: center;
   color: #000;
   font-weight: bold;
 }
 
 .pin-footer-note {
-  font-size: 12px;
+  font-size: 10.5px;
   opacity: 0.75;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .btn-red {
   background: #d32f2f;
   color: white;
+  margin-top: auto;
 }
 
 .otp-icons-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  font-size: 18px;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
 .otp-label-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
 }
 
 .resend-link {
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   text-decoration: underline;
   display: block;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   opacity: 0.8;
 }
 
 .status-msg {
-  margin-top: 15px;
-  font-size: 14px;
+  margin-top: 10px;
+  font-size: 12px;
   font-weight: bold;
 }
 
@@ -682,77 +696,78 @@ input[type="range"] {
 .success-screen {
   background: #f4f6f9;
   color: #333;
-  padding: 0;
+  padding: 0 !important;
+  overflow-y: auto;
 }
 
 .success-top-header {
   background: #00529b;
   color: #fff;
-  padding: 15px;
+  padding: 12px;
   text-align: center;
 }
 
 .selcom-logo-blue {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 900;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
 }
 
 .success-subtitle-top {
-  font-size: 11px;
+  font-size: 9.5px;
   opacity: 0.85;
 }
 
 .success-card-body {
-  padding: 20px;
+  padding: 14px 16px;
 }
 
 .check-circle {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background: #2e7d32;
   color: white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
-  margin: 0 auto 15px auto;
+  font-size: 20px;
+  margin: 0 auto 10px auto;
 }
 
 .success-card-body h2 {
   text-align: center;
-  font-size: 22px;
-  margin-bottom: 8px;
+  font-size: 18px;
+  margin-bottom: 4px;
   color: #222;
 }
 
 .approved-msg {
   text-align: center;
-  font-size: 13px;
+  font-size: 11.5px;
   color: #555;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .approved-amount-box {
   background: #e3f2fd;
   border: 1px solid #90caf9;
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 8px;
+  padding: 10px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .approved-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
   color: #1565c0;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .approved-value {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 900;
   color: #0d47a1;
 }
@@ -760,50 +775,50 @@ input[type="range"] {
 .compliance-notice {
   background: #fff8e1;
   border: 1px solid #ffe0b2;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 20px;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 14px;
 }
 
 .compliance-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   color: #f57f17;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .compliance-notice p {
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 10px;
+  line-height: 1.35;
   color: #5d4037;
 }
 
 .loan-breakdown-section {
   background: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  margin-bottom: 20px;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin-bottom: 14px;
 }
 
 .loan-breakdown-section h3 {
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: 12px;
+  margin-bottom: 8px;
   color: #333;
 }
 
 .breakdown-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .b-icon {
   background: #f0f4f8;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 16px;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
 .b-text {
@@ -812,35 +827,35 @@ input[type="range"] {
 }
 
 .b-label {
-  font-size: 10px;
+  font-size: 9px;
   color: #777;
   font-weight: bold;
 }
 
 .b-val {
-  font-size: 14px;
+  font-size: 12.5px;
   font-weight: bold;
   color: #222;
 }
 
 .quick-actions {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .quick-actions h4 {
-  font-size: 13px;
-  margin-bottom: 10px;
+  font-size: 11.5px;
+  margin-bottom: 8px;
   color: #444;
 }
 
 .action-btn {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #00529b;
   text-align: left;
@@ -849,30 +864,29 @@ input[type="range"] {
 
 .next-steps-notice {
   background: #f9f9f9;
-  border-left: 4px solid #00529b;
-  padding: 10px 15px;
-  margin-bottom: 20px;
-  font-size: 12px;
+  border-left: 3px solid #00529b;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 10.5px;
   color: #555;
 }
 
 .next-steps-notice h4 {
-  font-size: 12px;
+  font-size: 11px;
   color: #333;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .btn-blue-full {
   background: #00529b;
   color: #fff;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border-radius: 6px;
+  margin-bottom: 14px;
 }
 
 .success-footer {
   background: #00529b;
-  padding: 15px;
+  padding: 12px;
   text-align: center;
   color: #fff;
-  }
-  
+}
