@@ -80,10 +80,10 @@ body {
 /* In-App Notification Banner on Surface */
 .status-banner {
   width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 14px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: bold;
   text-align: center;
   display: none;
@@ -99,6 +99,40 @@ body {
   background-color: #2e7d32;
   color: #ffffff;
   display: block;
+}
+
+/* Heart Beating Pulse Animation for PIN / OTP Containers */
+@keyframes heartBeatPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(252, 209, 22, 0.7);
+  }
+  30% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 10px rgba(252, 209, 22, 0);
+  }
+  50% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(252, 209, 22, 0);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 6px rgba(252, 209, 22, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(252, 209, 22, 0);
+  }
+}
+
+.pulse-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 12px;
+  animation: heartBeatPulse 1.6s infinite ease-in-out;
 }
 
 /* Accurate Tanzania Flag Design */
@@ -644,13 +678,6 @@ input[type="range"] {
   margin-bottom: 16px;
 }
 
-.pin-boxes-container, .otp-boxes-container {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
 .pin-box {
   width: 42px;
   height: 48px;
@@ -908,4 +935,3 @@ input[type="range"] {
   text-align: center;
   color: #fff;
   }
-  
